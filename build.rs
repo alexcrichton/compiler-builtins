@@ -180,16 +180,6 @@ mod c {
             ],
         );
 
-        // When compiling in rustbuild (the rust-lang/rust repo) this library
-        // also needs to satisfy intrinsics that jemalloc or C in general may
-        // need, so include a few more that aren't typically needed by
-        // LLVM/Rust.
-        if cfg!(feature = "rustbuild") {
-            sources.extend(&[
-                "ffsdi2.c",
-            ]);
-        }
-
         // On iOS and 32-bit OSX these are all just empty intrinsics, no need to
         // include them.
         if target_os != "ios" && (target_vendor != "apple" || target_arch != "x86") {
@@ -424,13 +414,7 @@ mod c {
             sources.remove(&["aeabi_cdcmp", "aeabi_cfcmp"]);
         }
 
-        // When compiling in rustbuild (the rust-lang/rust repo) this build
-        // script runs from a directory other than this root directory.
-        let root = if cfg!(feature = "rustbuild") {
-            Path::new("../../libcompiler_builtins")
-        } else {
-            Path::new(".")
-        };
+        let root = Path::new(".");
 
         let src_dir = root.join("compiler-rt/lib/builtins");
         for src in sources.map.values() {
